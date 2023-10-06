@@ -1,45 +1,101 @@
-
 document.addEventListener('DOMContentLoaded', () => {
+
+
     const todoInput = document.getElementById('task');
     const taskButton = document.getElementById('addTask');
-    const todoList = document.getElementById('todoList');
-    
-    console.log(todoList);
-    taskButton.addEventListener('click', () => {
-        console.log('add todo clicked')
-    })
-    
-    // adds new task
-    const addTask = (task) => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = task["content"]
-    //   const deleteButton = listItem.querySelector('.delete-button');
-    // //   deleteButton.addEventListener('click', () => deleteTask(listItem));
-        console.log(listItem);
-    }
-
-    // const deleteTask = (listItem) => {
-        
-    // }
+    const todoList = document.getElementById('accordion');
+    const newPost = document.getElementById("newPost");
 
     // get all tasks from database
-    const getAllTask =  async () => {
+    const getAllTask = async () => {
         try {
-            const response = await fetch ("http://localhost:8080/posts");
+            const response = await fetch("http://localhost:8080/posts");
             const data = await response.json();
-            console.log(data);
-
+            if (data.length === 0) {
+                todoList.innerHTML = 'Your Dairy is empty!'
+            }
             data.forEach((task) => {
                 const e = addTask(task)
                 todoList.appendChild(e)
             })
         } catch (err) {
-            console.error("error fetching data", err)
+            console.error(err)
         }
     };
+
+    newPost.addEventListener('submit', async e => {
+        try {
+            e.preventDefault()
+            const content = todoInput.value
+            const date = document.querySelector("#taskDate").value
+            const options = {
+                method: "POST",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    category_id: 1,
+                    content: content,
+                    date: date
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                }
+            }
+            const response = await fetch("http://localhost:8080/posts", options);
+            const result = await response.json();
+            if (!content) {
+                alert('Fill the Post textarea!')
+            }
+            addTask(result)
+            window.location.reload();
+        } catch (err) {
+            console.error(err)
+        }
+    })
+
+    // adds new task
+    const addTask = (task) => {
+        const content = document.createElement('div')
+        let id = task['id']
+        content.classList.add('card', 'mb-2', `card-post-${id}`)
+        content.innerHTML = `
+            <div id="heading-${id}">
+                <div class="btn-group d-flex justify-content-between">
+                    <button class="btn btn-link dropdown-toggle flex-grow-0" data-bs-toggle="collapse" data-bs-target="#collapse-${id}" aria-expanded="true" aria-controls="collapse-${id}">
+                        Post from ${task['date'].slice(0, 10)}
+                    </button>
+
+                    <button id="deleteButton-${id}" type="button" class="btn-close my-2 me-2 btn-outline-primary" aria-label="Close"></button>
+                </div>
+            </div>
     
+            <div id="collapse-${id}" class="collapse multi-collapse" aria-labelledby="heading-${id}" data-bs-parent="#accordion">
+                <div class="card-body">
+                    ${task["content"]}
+                </div>
+            </div>
+        `
+        return content;
+    }
 
+    //Delete post
+    document.addEventListener('click', event => {
+        if (event.target.matches(".btn-close")) {
+            const id = (event.target.id).split('-')[1];
+            fetch(`http://localhost:8080/posts/${id}`, { method: "DELETE" })
+                .then(response => {
+                    document.getElementById(`heading-${id}`).classList.add('fade')
+                    setTimeout(() => {
+                        document.querySelector(`.card-post-${id}`).remove()
+                    }, "300");
+                    response.json()
+                });
 
+        }
+    })
     getAllTask();
-});
+
+})
 
