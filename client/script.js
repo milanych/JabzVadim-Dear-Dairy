@@ -2,9 +2,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     const todoInput = document.getElementById('task');
-    const taskButton = document.getElementById('addTask');
     const todoList = document.getElementById('accordion');
     const newPost = document.getElementById("newPost");
+    const categories = document.getElementById('categoriesList');
+    const thisDate = document.querySelector("#taskDate");
 
     // get all tasks from database
     const getAllTask = async () => {
@@ -22,12 +23,26 @@ document.addEventListener('DOMContentLoaded', () => {
             console.error(err)
         }
     };
-
+    const getAllCategories = async () => {
+        try {
+            const response = await fetch("http://localhost:8080/categories");
+            const data = await response.json();
+            data.forEach((task) => {
+                let option = document.createElement('option')
+                option.innerHTML = task['category']
+                option.value = task['category_id']
+                categories.appendChild(option)
+            })
+        } catch (err) {
+            console.error(err)
+        }
+    }
+    getAllCategories()
     newPost.addEventListener('submit', async e => {
         try {
             e.preventDefault()
             const content = todoInput.value
-            const date = document.querySelector("#taskDate").value
+            const date = thisDate.value
             const options = {
                 method: "POST",
                 headers: {
@@ -35,9 +50,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    category_id: 1,
+                    category_id: categories.value,
                     content: content,
-                    date: date
+                    date: document.querySelector("#taskDate").value
                 }),
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -45,10 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             const response = await fetch("http://localhost:8080/posts", options);
             const result = await response.json();
-            if (!content) {
-                alert('Fill the Post textarea!')
+            if (!content || categories[0].selected || !date) {
+                alert('Fill all fields')
             }
             addTask(result)
+            console.log(result)
             window.location.reload();
         } catch (err) {
             console.error(err)
@@ -64,7 +80,7 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="heading-${id}">
                 <div class="btn-group d-flex justify-content-between">
                     <button class="btn btn-link dropdown-toggle flex-grow-0" data-bs-toggle="collapse" data-bs-target="#collapse-${id}" aria-expanded="true" aria-controls="collapse-${id}">
-                        Post from ${task['date'].slice(0, 10)}
+                        Category: ${task['category']}, ${task['date']}
                     </button>
 
                     <button id="deleteButton-${id}" type="button" class="btn-close my-2 me-2 btn-outline-primary" aria-label="Close"></button>
@@ -96,6 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
     getAllTask();
+
+
+
 
 })
 

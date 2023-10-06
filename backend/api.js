@@ -4,6 +4,7 @@ const cors = require('cors');
 const logger = require('./middleware/logger');
 const postRouter = require('./routers/post');
 const userRouter = require('./routers/user');
+const categoryRouter = require('./routers/categories');
 
 const api = express();
 
@@ -18,6 +19,7 @@ api.get("/", (req, res) => {
   })
 })
 
+api.use("/categories", categoryRouter);
 api.use("/posts", postRouter);
 api.use("/users", userRouter);
 
