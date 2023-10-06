@@ -1,10 +1,11 @@
-.main-row{
-    height: 100vh;
+body {
+    height: 100dvh;
 }
-.main-col{
-    max-width: 500px;
-    min-height: 300px;
+
+.main-col {
+    max-width: 600px;
 }
-.todo-done{
+
+.todo-done {
     text-decoration: line-through;
 }
