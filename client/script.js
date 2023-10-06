@@ -12,15 +12,32 @@ document.addEventListener('DOMContentLoaded', () => {
     // adds new task
     const addTask = (task) => {
         const listItem = document.createElement('li');
-        listItem.innerHTML = task["content"]
-    //   const deleteButton = listItem.querySelector('.delete-button');
-    // //   deleteButton.addEventListener('click', () => deleteTask(listItem));
+        listItem.innerHTML = task.content;
+    
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.addEventListener('click', () => deleteTask(listItem, task.id));
+    
+        listItem.appendChild(deleteButton);
+        console.log(listItem);
+        
+        return listItem;
         console.log(listItem);
     }
 
-    // const deleteTask = (listItem) => {
-        
-    // }
+    const deleteTask = async (listItem, id) => {
+        try {
+            const response = await fetch(`http://localhost:8080/posts/${id}`)
+    
+            if (response.status == ok) {
+                listItem.remove();
+            } else {
+                console.error('Error deleting task');
+            }
+        } catch (err) {
+            console.error('Error deleting task:', err);
+        }
+    }
 
     // get all tasks from database
     const getAllTask =  async () => {
