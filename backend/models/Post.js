@@ -38,7 +38,7 @@ class Post {
     let newContent = data.content
     const { rows } = await db.query(query, [newContent, id]);
     if (rows.length === 0) {
-      throw new Error("Unable to update votes.")
+      throw new Error("Unable to update.")
     }
     return rows[0];
   }

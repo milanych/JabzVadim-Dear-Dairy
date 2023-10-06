@@ -45,14 +45,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const date = thisDate.value
             const options = {
                 method: "POST",
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json'
-                },
                 body: JSON.stringify({
                     category_id: categories.value,
                     content: content,
-                    date: new Date(thisDate)
+                    date: thisDate.value
                 }),
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -71,6 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })
 
+
     // adds new task
     const addTask = (task) => {
         const content = document.createElement('div')
@@ -80,21 +77,51 @@ document.addEventListener('DOMContentLoaded', () => {
             <div id="heading-${id}">
                 <div class="btn-group d-flex justify-content-between">
                     <button class="btn dropdown-toggle fst-italic flex-grow-0" data-bs-toggle="collapse" data-bs-target="#collapse-${id}" aria-expanded="true" aria-controls="collapse-${id}">
-                        ${new Date(task['date']).toLocaleDateString("en-UK", { year: 'numeric', month: 'long', day: 'numeric' })} // Post in «${task['category']}» category
+                        ${new Date(task['date']).toLocaleDateString("en-US", { year: 'numeric', month: 'long', day: 'numeric' })} // Post in «${task['category']}» category
                     </button >
-<a href="#" class="my-2 ms-auto me-4 btn-link">Edit</a>
+
     <button id="deleteButton-${id}" type="button" class="btn-close my-2 me-2 btn-outline-primary" aria-label="Close"></button>
                 </div >
             </div >
 
     <div id="collapse-${id}" class="collapse multi-collapse" aria-labelledby="heading-${id}" data-bs-parent="#accordion">
         <div class="card-body">
-            ${task["content"]}
+            ${task["content"]}<a href="#" class="my-2 ms-4 btn-link edit-link" id="edit-${id}">Edit</a>
         </div>
     </div>
 `
         return content;
     }
+    //update
+    document.addEventListener('click', event => {
+        if (event.target.matches(".edit-link")) {
+            const id = (event.target.id).split('-')[1];
+            event.preventDefault()
+
+            const editLink = event.target
+
+            editLink.style.display = 'none'
+            fetch(`http://localhost:8080/posts/${id}`, {
+                method: "PATCH",
+                body: JSON.stringify({
+                    category_id: categories.value,
+                    content: content,
+                    date: thisDate.value
+                }),
+                headers: {
+                    'Content-type': 'application/json; charset=UTF-8',
+                }
+            })
+                .then(response => {
+
+                    // document.getElementById(`heading-${id}`).classList.add('fade')
+                    // document.querySelector(`.card-post-${id}`).remove()
+
+                    response.json()
+                });
+
+        }
+    })
 
     //Delete post
     document.addEventListener('click', event => {
