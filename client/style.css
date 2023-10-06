@@ -1,5 +1,10 @@
-body {
+html, body {
     height: 100dvh;
+}
+
+body {
+    font-family: 'Lora', serif;
+    background-color: #cff4fc
 }
 
 .main-col {
@@ -8,4 +13,8 @@ body {
 
 .todo-done {
     text-decoration: line-through;
+}
+
+h1 {
+    white-space: nowrap;
 }

@@ -52,7 +52,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify({
                     category_id: categories.value,
                     content: content,
-                    date: document.querySelector("#taskDate").value
+                    date: new Date(thisDate)
                 }),
                 headers: {
                     'Content-type': 'application/json; charset=UTF-8',
@@ -62,10 +62,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const result = await response.json();
             if (!content || categories[0].selected || !date) {
                 alert('Fill all fields')
+            } else {
+                addTask(result)
+                window.location.reload();
             }
-            addTask(result)
-            console.log(result)
-            window.location.reload();
         } catch (err) {
             console.error(err)
         }
@@ -79,20 +79,20 @@ document.addEventListener('DOMContentLoaded', () => {
         content.innerHTML = `
             <div id="heading-${id}">
                 <div class="btn-group d-flex justify-content-between">
-                    <button class="btn btn-link dropdown-toggle flex-grow-0" data-bs-toggle="collapse" data-bs-target="#collapse-${id}" aria-expanded="true" aria-controls="collapse-${id}">
-                        Category: ${task['category']}, ${task['date']}
-                    </button>
+                    <button class="btn dropdown-toggle fst-italic flex-grow-0" data-bs-toggle="collapse" data-bs-target="#collapse-${id}" aria-expanded="true" aria-controls="collapse-${id}">
+                        ${new Date(task['date']).toLocaleDateString("en-UK", { year: 'numeric', month: 'long', day: 'numeric' })} // Post in «${task['category']}» category
+                    </button >
+<a href="#" class="my-2 ms-auto me-4 btn-link">Edit</a>
+    <button id="deleteButton-${id}" type="button" class="btn-close my-2 me-2 btn-outline-primary" aria-label="Close"></button>
+                </div >
+            </div >
 
-                    <button id="deleteButton-${id}" type="button" class="btn-close my-2 me-2 btn-outline-primary" aria-label="Close"></button>
-                </div>
-            </div>
-    
-            <div id="collapse-${id}" class="collapse multi-collapse" aria-labelledby="heading-${id}" data-bs-parent="#accordion">
-                <div class="card-body">
-                    ${task["content"]}
-                </div>
-            </div>
-        `
+    <div id="collapse-${id}" class="collapse multi-collapse" aria-labelledby="heading-${id}" data-bs-parent="#accordion">
+        <div class="card-body">
+            ${task["content"]}
+        </div>
+    </div>
+`
         return content;
     }
 
